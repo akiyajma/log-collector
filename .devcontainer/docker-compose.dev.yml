@@ -1,0 +1,37 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ..:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      AWS_REGION: us-east-1
+      NETSKOPE_API_ENDPOINT: http://netskope-mock:5000
+      NETSKOPE_TOKEN: dummy
+      S3_BUCKET: netskope-events
+      S3_ENDPOINT: http://localstack:4566
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+      MAX_FETCH_PAGES: 100
+      MAX_FETCH_DURATION_SECONDS: 300
+    depends_on:
+      - localstack
+      - netskope-mock
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - ../init-scripts:/etc/localstack/init/ready.d:ro
+
+  netskope-mock:
+    build: ../mock/netskope
+    ports:
+      - "5000:5000"

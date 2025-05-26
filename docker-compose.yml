@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+
+  netskope-mock:
+    build: ./mock/netskope
+    ports:
+      - "5000:5000"
+
+  collector:
+    build: .
+    environment:
+      NETSKOPE_API_ENDPOINT: http://netskope-mock:5000
+      NETSKOPE_TOKEN: dummy
+      S3_BUCKET: netskope-events
+      S3_ENDPOINT: http://localstack:4566
+      AWS_REGION: us-east-1
+      ENDPOINT: alert
+      SINCE_MINUTES: 15
+    depends_on:
+      - localstack
+      - netskope-mock

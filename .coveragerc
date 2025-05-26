@@ -1,0 +1,13 @@
+# .coveragerc
+[run]
+source = src/netskope_collector
+branch = True
+
+[report]
+show_missing = True
+skip_covered = false
+omit =
+    */__init__.py
+    */config.py
+    */logger.py
+    */tests/*
